@@ -179,6 +179,91 @@ $global:action = {
 	# switch commands / messages - add what you like here
 	switch ($BotCMD)
 	{
+		"sorry" {
+			$sendMe = 1
+			$msg.Add(0, 'you should be sorry for what you have done :-(')
+			
+		}
+		"wassup" {
+			$sendMe = 1
+			$msg.Add(0, 'nothing much, wassup with you?')
+			
+		}
+		"how" {
+			$sendMe = 1
+			$msg.Add(0, 'How about you google it :-)')
+			
+		}
+		"yes" {
+			$sendMe = 1
+			$msg.Add(0, 'Yessssssssiiirrrrrrrr')
+			
+		}
+		"I" {
+			$sendMe = 1
+			$msg.Add(0, 'There is no I in team!')
+			
+		}
+		"sup" {
+			$sendMe = 1
+			$msg.Add(0, 'Is it time for supper already?')
+			
+		}
+		"you" {
+			$sendMe = 1
+			$msg.Add(0, 'its always you you you, what about me?')
+			
+		}
+		"lol" {
+			$sendMe = 1
+			$msg.Add(0, 'whats so funny?')
+			
+		}
+		"just" {
+			$sendMe = 1
+			$msg.Add(0, 'just what?')
+			
+		}
+		"yeah" {
+			$sendMe = 1
+			$msg.Add(0, 'yeah what?')
+			
+		}
+		"yea" {
+			$sendMe = 1
+			$msg.Add(0, 'yea what?')
+			
+		}
+		"nothing" {
+			$sendMe = 1
+			$msg.Add(0, 'sounds like something!')
+			
+		}
+		"what" {
+			$sendMe = 1
+			$msg.Add(0, 'whatup with you?')
+			
+		}
+		"what`'s" {
+			$sendMe = 1
+			$msg.Add(0, "what`'s up with you?")
+			
+		}
+		"whats" {
+			$sendMe = 1
+			$msg.Add(0, 'whats up with you?')
+			
+		}
+		"nm" {
+			$sendMe = 1
+			$msg.Add(0, 'just chillin...')
+			
+		}
+		"yo" {
+			$sendMe = 1
+			$msg.Add(0, 'Wassup?')
+			
+		}
 		"hey" {
 			$sendMe = 1
 			$msg.Add(0, 'Hello')
