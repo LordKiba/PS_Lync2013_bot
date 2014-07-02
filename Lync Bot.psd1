@@ -18,7 +18,7 @@
 ModuleToProcess = 'Lync Bot.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.4.2.15'
+ModuleVersion = '1.4.2.14'
 
 # ID used to uniquely identify this module
 GUID = 'a70892e8-53a3-4311-a2f4-e137bc36cfbd'
