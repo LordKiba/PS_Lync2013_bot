@@ -76,7 +76,7 @@ function lync-state-change
 	}
 	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::SignedIn)
 	{
-		$usr = $Self.Contact.Uri.ToString().TrimStart("sip:")
+		$usr = $Client.Uri.ToString().TrimStart("sip:")
 		Write-Host "User is logged in and Powershell is ready for Bot Startup"
 		function Global:prompt { "Lync Bot CLI [$usr] >" }
 		prompt
@@ -432,7 +432,7 @@ function Lync-NoBot
 			Lync-NoBot
 	#>
 	
-	$usr = $Self.Contact.Uri.ToString().TrimStart("sip:")
+	$usr = $Client.Uri.ToString().TrimStart("sip:")
 	# Clear all Bot subscribed events
 	Get-EventSubscriber | Unregister-Event
 	function Global:prompt { "Lync Bot CLI [$usr] >" }
@@ -547,7 +547,7 @@ function Lync-Bot
 			}
 		}
 	}
-	$usr = $Self.Contact.Uri.ToString().TrimStart("sip:")
+	$usr = $Client.Uri.ToString().TrimStart("sip:")
 	function Global:prompt { "Lync Bot CLI [$usr] [Bot:ON] >" }
 }
 
