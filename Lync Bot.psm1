@@ -94,24 +94,6 @@ function lync-state-change
 	}
 }
 
-function Lync-reload
-{
-	<#
-		.SYNOPSIS
-			Lync-reload is a PowerShell function to Kill the autoresponce bot and reload the Lync bot module.  
-		
-		.DESCRIPTION
-   			The purpose of Lync-reload is to demonstrate how PowerShell can be used to interact with the Lync SDK.
-	
-		.EXAMPLE
-			Lync-reload
-	#>
-	
-	Lync-NoBot
-	Remove-Module 'Lync Bot'
-	Import-Module 'Lync Bot'
-}
-
 function lync-send-msg($msg)
 {
 	# Send the message
@@ -122,26 +104,33 @@ function Lync-Availability
 {
 	
 	<#
-.Synopsis
-   Lync-Availability is a PowerShell function to configure a set of settings in the Microsoft Lync client via the Model API.
-.DESCRIPTION
-   The purpose of Lync-Availability is to demonstrate how PowerShell can be used to interact with the Lync SDK.
-.EXAMPLE
-   Publish-LyncContactInformation -Availability Available
-.EXAMPLE
-    Publish-LyncContactInformation -Availability Away
-.EXAMPLE
-    Publish-LyncContactInformation -Availability "Off Work" -ActivityId off-work
-.EXAMPLE
-    Publish-LyncContactInformation -PersonalNote test
-.EXAMPLE
-    Publish-LyncContactInformation -Availability Available -PersonalNote ("Quote of the day: " + (Get-QOTD))
-.EXAMPLE
-    Publish-LyncContactInformation -Location Work
-.FUNCTIONALITY
-   Provides a function to configure Availability, ActivityId and PersonalNote for the Microsoft Lync client.
-#>
+	.Synopsis
+   		Lync-Availability is a PowerShell function to configure a set of settings in the Microsoft Lync client via the Model API.
 
+	.DESCRIPTION
+  		 The purpose of Lync-Availability is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+
+	.EXAMPLE
+   		Publish-LyncContactInformation -Availability Available
+
+	.EXAMPLE
+  	  Publish-LyncContactInformation -Availability Away
+
+	.EXAMPLE
+    	Publish-LyncContactInformation -Availability "Off Work" -ActivityId off-work
+
+	.EXAMPLE
+  	  Publish-LyncContactInformation -PersonalNote test
+
+	.EXAMPLE
+  	  Publish-LyncContactInformation -Availability Available -PersonalNote ("Quote of the day: " + (Get-QOTD))
+
+	.EXAMPLE
+    	Publish-LyncContactInformation -Location Work
+
+	.FUNCTIONALITY
+  		 Provides a function to configure Availability, ActivityId and PersonalNote for the Microsoft Lync client.
+#>
 	Param (
 		[ValidateSet("Appear Offline", "Available", "Away", "Busy", "Do Not Disturb", "Be Right Back", "Off Work")]
 		[string]
@@ -424,6 +413,7 @@ function Lync-NoBot
 	<#
 		.SYNOPSIS
 			Lync-NoBot is a PowerShell function to turn off the Lync Autoresponce bot 
+
 		.DESCRIPTION
    			The purpose of Lync-NoBot is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 	
@@ -441,6 +431,7 @@ function Lync-Signout
 		<#
 		.SYNOPSIS
 			Lync-Signout is a PowerShell function to turn off the Lync Autoresponce bot and sign out of the Lync client 
+
 		.DESCRIPTION
    			The purpose of Lync-NoBot is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 	
