@@ -76,9 +76,8 @@ function lync-state-change
 	}
 	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::SignedIn)
 	{
-		$usr = $Self.Contact.Uri.ToString().TrimStart("sip:")
 		Write-Host "User is logged in and Powershell is ready for Bot Startup"
-		function Global:prompt { "Lync Bot CLI [$usr] >" }
+		function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:");"Lync Bot CLI [$usr] >" }
 		prompt
 	}
 	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::SignedOut)
@@ -432,10 +431,9 @@ function Lync-NoBot
 			Lync-NoBot
 	#>
 	
-	$usr = $Self.Contact.Uri.ToString().TrimStart("sip:")
 	# Clear all Bot subscribed events
 	Get-EventSubscriber | Unregister-Event
-	function Global:prompt { "Lync Bot CLI [$usr] >" }
+	function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:");"Lync Bot CLI [$usr] >" }
 }
 
 function Lync-Signout
@@ -547,8 +545,7 @@ function Lync-Bot
 			}
 		}
 	}
-	$usr = $Self.Contact.Uri.ToString().TrimStart("sip:")
-	function Global:prompt { "Lync Bot CLI [$usr] [Bot:ON] >" }
+	function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:");"Lync Bot CLI [$usr] [Bot:ON] >" }
 }
 
 function Lync-reload
