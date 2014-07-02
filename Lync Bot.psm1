@@ -54,6 +54,18 @@ $global:Self = $client.Self
 #Test Client State for Logon/init state
 function lync-state-change
 {
+		<#
+		.SYNOPSIS
+			lync-state-change is a PowerShell function to detect the current Lync Client state.  
+		
+		.DESCRIPTION
+   			The purpose of lync-state-change is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+	
+		.EXAMPLE
+			Lync-reload
+	#>
+	
+	
 	$Lyncstate = $Client.State
 	if ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::Uninitialized)
 	{
@@ -83,6 +95,24 @@ function lync-state-change
 	}
 }
 
+function Lync-reload
+{
+	<#
+		.SYNOPSIS
+			Lync-reload is a PowerShell function to Kill the autoresponce bot and reload the Lync bot module.  
+		
+		.DESCRIPTION
+   			The purpose of Lync-reload is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+	
+		.EXAMPLE
+			Lync-reload
+	#>
+	
+	Lync-NoBot
+	Remove-Module 'Lync Bot'
+	Import-Module 'Lync Bot'
+}
+
 function lync-send-msg($msg)
 {
 	# Send the message
@@ -91,6 +121,28 @@ function lync-send-msg($msg)
 
 function Lync-Availability
 {
+	
+	<#
+.Synopsis
+   Lync-Availability is a PowerShell function to configure a set of settings in the Microsoft Lync client via the Model API.
+.DESCRIPTION
+   The purpose of Lync-Availability is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+.EXAMPLE
+   Publish-LyncContactInformation -Availability Available
+.EXAMPLE
+    Publish-LyncContactInformation -Availability Away
+.EXAMPLE
+    Publish-LyncContactInformation -Availability "Off Work" -ActivityId off-work
+.EXAMPLE
+    Publish-LyncContactInformation -PersonalNote test
+.EXAMPLE
+    Publish-LyncContactInformation -Availability Available -PersonalNote ("Quote of the day: " + (Get-QOTD))
+.EXAMPLE
+    Publish-LyncContactInformation -Location Work
+.FUNCTIONALITY
+   Provides a function to configure Availability, ActivityId and PersonalNote for the Microsoft Lync client.
+#>
+
 	Param (
 		[ValidateSet("Appear Offline", "Available", "Away", "Busy", "Do Not Disturb", "Be Right Back", "Off Work")]
 		[string]
@@ -370,6 +422,16 @@ $global:action = {
 
 function Lync-NoBot
 {
+	<#
+		.SYNOPSIS
+			Lync-NoBot is a PowerShell function to turn off the Lync Autoresponce bot 
+		.DESCRIPTION
+   			The purpose of Lync-NoBot is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+	
+		.EXAMPLE
+			Lync-NoBot
+	#>
+	
 	$usr = $Self.Contact.Uri.ToString().TrimStart("sip:")
 	# Clear all Bot subscribed events
 	Get-EventSubscriber | Unregister-Event
@@ -378,6 +440,16 @@ function Lync-NoBot
 
 function Lync-Signout
 {
+		<#
+		.SYNOPSIS
+			Lync-Signout is a PowerShell function to turn off the Lync Autoresponce bot and sign out of the Lync client 
+		.DESCRIPTION
+   			The purpose of Lync-NoBot is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+	
+		.EXAMPLE
+			Lync-Signout
+	#>
+	
 	Write-Host "Unsubscribeing All Lync Events this session"
 	Lync-NoBot
 	Write-Host "initializeing signout process"
@@ -391,6 +463,20 @@ prompt
 
 function Lync-Shutdown ([system.Boolean]$Confirm)
 {
+		<#
+		.SYNOPSIS
+			Lync-Shutdown is a PowerShell function to Shutdown the Lync Client 
+		
+		.DESCRIPTION
+   			The purpose of Lync-Shutdown is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+	
+		.PARAMETER Confirm
+				Used to Confirm the Lync Client Shutdown Process
+
+		.EXAMPLE
+			Lync-Shutdown -Confirm
+	#>
+	
 	if ($Confirm -eq $true)
 	{
 		Lync-Signout
@@ -407,6 +493,17 @@ function Lync-Shutdown ([system.Boolean]$Confirm)
 
 function Lync-Bot
 {
+		<#
+		.SYNOPSIS
+			Lync-Bot is a PowerShell function to Start the Lync Auto responder bot 
+		
+		.DESCRIPTION
+   			The purpose of Lync-Bot is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+	
+		.EXAMPLE
+			Lync-Bot
+	#>
+	
 	# Register events for current open conversation participants
 	foreach ($con in $client.ConversationManager.Conversations)
 	{
@@ -454,6 +551,24 @@ function Lync-Bot
 	function Global:prompt { "Lync Bot CLI [$usr] [Bot:ON] >" }
 }
 
+function Lync-reload
+{
+	<#
+		.SYNOPSIS
+			Lync-reload is a PowerShell function to Kill the autoresponce bot and reload the Lync bot module.  
+		
+		.DESCRIPTION
+   			The purpose of Lync-reload is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+	
+		.EXAMPLE
+			Lync-reload
+	#>
+	
+	Lync-NoBot
+	Remove-Module 'Lync Bot'
+	Import-Module 'Lync Bot'
+}
+
 # Runtime INIT
 clear
 $Host.UI.RawUI.WindowTitle = "Lync Bot C&C Console"
@@ -468,13 +583,6 @@ Register-ObjectEvent -InputObject $Client `
 
 #init state change processing
 lync-state-change
-
-function Lync-reload
-{
-	Lync-NoBot
-	Remove-Module 'Lync Bot'
-	Import-Module 'Lync Bot'
-}
 
 # export module members
 Export-ModuleMember lync-State-Change
