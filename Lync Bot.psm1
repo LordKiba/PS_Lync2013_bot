@@ -47,8 +47,25 @@ catch [Microsoft.Lync.Model.ClientNotFoundException]
 {
 	throw "Lync client is not running! Please launch your Lync client."
 }
+
 $Client.add_StateChanged
-$global:Auto = [Microsoft.Lync.Model.LyncClient]::GetAutomation()
+
+# test loading of Client Automation API's 
+try
+{
+	$global:Auto = [Microsoft.Lync.Model.LyncClient]::GetAutomation()
+	
+	if ($Auto -eq $null)
+	{
+		throw "Unable to obtain Lync Automation interface"
+	}
+	
+}
+catch
+{
+	throw "Automation Session is unavaiable" 
+}
+
 $global:Self = $client.Self
 
 #Test Client State for Logon/init state
@@ -96,6 +113,7 @@ function lync-state-change
 
 function lync-send-msg($msg)
 {
+	Write-Host "Bot Reply : " $msg.values
 	# Send the message
 	$null = $Modality.BeginSendMessage($msg, $null, $msg)
 }
@@ -111,22 +129,22 @@ function Lync-Availability
   		 The purpose of Lync-Availability is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 
 	.EXAMPLE
-   		Publish-LyncContactInformation -Availability Available
+   		Lync-Availability -Availability Available
 
 	.EXAMPLE
-  	  Publish-LyncContactInformation -Availability Away
+  	  Lync-Availability -Availability Away
 
 	.EXAMPLE
-    	Publish-LyncContactInformation -Availability "Off Work" -ActivityId off-work
+    	Lync-Availability -Availability "Off Work" -ActivityId off-work
 
 	.EXAMPLE
-  	  Publish-LyncContactInformation -PersonalNote test
+  	  Lync-Availability -PersonalNote test
 
 	.EXAMPLE
-  	  Publish-LyncContactInformation -Availability Available -PersonalNote ("Quote of the day: " + (Get-QOTD))
+  	  Lync-Availability -Availability Available -PersonalNote ("Quote of the day: " + (Get-QOTD))
 
 	.EXAMPLE
-    	Publish-LyncContactInformation -Location Work
+    	Lync-Availability -Location Work
 
 	.FUNCTIONALITY
   		 Provides a function to configure Availability, ActivityId and PersonalNote for the Microsoft Lync client.
@@ -200,9 +218,7 @@ $global:action = {
 	
 	# get the conversation that caused the event
 	$Conversation = $Event.Sender.Conversation
-	
-	Write-Host $Event.SourceArgs | fl -f 
-	
+	 
 	# Create a new msg collection for the response
 	$msg = New-Object "System.Collections.Generic.Dictionary[Microsoft.Lync.Model.Conversation.InstantMessageContentType,String]"
 	# Modality Type
@@ -211,10 +227,11 @@ $global:action = {
 	# The message recieved
 	[string]$msgStr = $Event.SourceArgs.Text
 	$msgStr = $msgStr.ToString().ToLower().Trim()
-	Write-Host $msgStr
+	Write-Host "message Recieved" $msgStr
 	$BotCMD = $msgStr.Split(" ")
+	$attribs = $msgStr.TrimStart("$BotCMD[0]")
 	$BotCMD = $BotCMD[0].TrimEnd(".!?")
-	Write-Host "First index in array is : " $BotCMD
+#	Write-Host "First index in array is : " $BotCMD
 	
 	# switch commands / messages - add what you like here
 	switch ($BotCMD)
@@ -394,6 +411,19 @@ $global:action = {
 			$sendMe = 1
 			$msg.Add(0, 'NP, Your Welcome')
 		}
+		"huh"{
+			$sendMe = 1
+			$msg.Add(0, 'What ?')
+		}
+		"md5"{
+			$md5 = new-object -TypeName System.Security.Cryptography.MD5CryptoServiceProvider
+			$utf8 = new-object -TypeName System.Text.UTF8Encoding
+			$hash = [System.BitConverter]::ToString($md5.ComputeHash($utf8.GetBytes($attribs)))
+			$hash = $hash -replace "-", ""
+			$sendMe = 1
+			$msg.Add(0, "$hash")
+			
+		}
 		default
 		{
 			# do nothing
@@ -492,8 +522,8 @@ function Lync-Bot
 		.EXAMPLE
 			Lync-Bot
 	#>
-	
-	# Register events for current open conversation participants
+	$ErrorActionPreference = [System.Management.Automation.ActionPreference]::SilentlyContinue
+		# Register events for current open conversation participants
 	foreach ($con in $client.ConversationManager.Conversations)
 	{
 		# For each participant in the conversation
@@ -501,18 +531,21 @@ function Lync-Bot
 		
 		foreach ($mo in $moo)
 		{
-			$mo.Contact.uri
-			if (!(Get-EventSubscriber $mo.Contact.uri))
+			try
 			{
-				Register-ObjectEvent -InputObject $mo.Modalities[1] `
-									 -EventName "InstantMessageReceived" `
-									 -SourceIdentifier $mo.Contact.uri `
-									 -action $action
+				if (!(Get-EventSubscriber $mo.Contact.uri))
+				{
+					Register-ObjectEvent -InputObject $mo.Modalities[1] `
+										 -EventName "InstantMessageReceived" `
+										 -SourceIdentifier $mo.Contact.uri `
+										 -action $action
+				}
+			}
+			catch [system.ArgumentException] { }
 		}
+		
 	}
-}
-
-# Add event to pickup new conversations and register events for new participants
+	# Add event to pickup new conversations and register events for new participants
 	$conversationMgr = $client.ConversationManager
 	Register-ObjectEvent -InputObject $conversationMgr `
 						 -EventName "ConversationAdded" `
@@ -536,6 +569,7 @@ function Lync-Bot
 			}
 		}
 	}
+	$ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
 	function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:");"Lync Bot CLI [$usr] [Bot:ON] >" }
 }
 
