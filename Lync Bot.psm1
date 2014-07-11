@@ -337,7 +337,7 @@ $global:action = {
 		}
 		"help" {
 			$sendMe = 1
-			$msg.Add(0, 'Mr James bot at your service!')
+			$msg.Add(0, 'Mr LyncBot at your service!')
 			lync-send-msg -msg $msg
 			sleep -Milliseconds 250
 			$msg = New-Object "System.Collections.Generic.Dictionary[Microsoft.Lync.Model.Conversation.InstantMessageContentType,String]"
@@ -349,7 +349,7 @@ $global:action = {
 			lync-send-msg -msg $msg
 			sleep -Milliseconds 250
 			$msg = New-Object "System.Collections.Generic.Dictionary[Microsoft.Lync.Model.Conversation.InstantMessageContentType,String]"
-			$msg.Add(0, 'moo')
+			$msg.Add(0, 'md5 <String>, rot13 <String>')
 			lync-send-msg -msg $msg
 			sleep -Milliseconds 250
 			$msg = New-Object "System.Collections.Generic.Dictionary[Microsoft.Lync.Model.Conversation.InstantMessageContentType,String]"
