@@ -501,6 +501,27 @@ function Lync-NoBot
 	function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:");"Lync Bot CLI [$usr] >" }
 }
 
+function Lync-Signin ([System.String]$UserURI)
+{
+		<#
+		.SYNOPSIS
+			Lync-Signin is a PowerShell function to turn off the Lync Autoresponce bot and sign out of the Lync client 
+
+		.DESCRIPTION
+   			The purpose of Lync-Signin is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+	
+		.EXAMPLE
+			Lync-Signin -UserURI User@demo.com
+	#>
+	$credential = Get-Credential -message "Lync Credentials requires `nSpecify Username as Domain\user"
+	Write-Host "Signing in Please stand by"
+	$ar = $Client.BeginSignIn($UserURI, $credential.UserName, $credential.Password, $communicatorClientCallback, $state)
+	while ($ar.IsCompleted -eq $false) { }
+	$Client.EndSignIn($ar)
+	Write-Host "Signed in. `nRun Lync-bot to start the bot."
+	function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:"); "Lync Bot CLI [$usr] >" }
+}
+
 function Lync-Signout
 {
 		<#
@@ -508,7 +529,7 @@ function Lync-Signout
 			Lync-Signout is a PowerShell function to turn off the Lync Autoresponce bot and sign out of the Lync client 
 
 		.DESCRIPTION
-   			The purpose of Lync-NoBot is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+   			The purpose of Lync-Signout is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 	
 		.EXAMPLE
 			Lync-Signout
@@ -628,12 +649,12 @@ function Lync-reload
    			The purpose of Lync-reload is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 	
 		.EXAMPLE
-			Lync-reload
+			Lync-reload 
 	#>
 	
 	Lync-NoBot
 	Remove-Module 'Lync Bot'
-	Import-Module 'Lync Bot'
+	Import-Module '.\Lync Bot.psd1'
 }
 
 #endregion
@@ -664,6 +685,7 @@ Export-ModuleMember Lync-Bot
 Export-ModuleMember Lync-NoBot
 Export-ModuleMember Lync-Shutdown
 Export-ModuleMember Lync-Signout
+Export-ModuleMember Lync-Signin
 Export-ModuleMember Lync-Availability
 Export-ModuleMember Lync-reload
 Export-ModuleMember do-Rot13
