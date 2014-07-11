@@ -10,9 +10,7 @@
 	===========================================================================
 #>
 
-# uncomment next line for error supression
-#$ErrorActionPreference = [System.Management.Automation.ActionPreference]::SilentlyContinue
-
+#region Pre-stage INIT Module Loading... 
 # Clear all previous subscribed events
 Get-EventSubscriber | Unregister-Event
 
@@ -68,48 +66,9 @@ catch
 
 $global:Self = $client.Self
 
-#Test Client State for Logon/init state
-function lync-state-change
-{
-		<#
-		.SYNOPSIS
-			lync-state-change is a PowerShell function to detect the current Lync Client state.  
-		
-		.DESCRIPTION
-   			The purpose of lync-state-change is to demonstrate how PowerShell can be used to interact with the Lync SDK.
-	
-		.EXAMPLE
-			Lync-reload
-	#>
-	
-	
-	$Lyncstate = $Client.State
-	if ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::Uninitialized)
-	{
-		Write-Host "Lync Client not in Initialized State.`n Initializeing ..."
-		$ar = $Client.BeginInitialize()
-		$Client.EndInitialize($ar)
-		
-	}
-	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::SignedIn)
-	{
-		Write-Host "User is logged in and Powershell is ready for Bot Startup"
-		function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:");"Lync Bot CLI [$usr] >" }
-		prompt
-	}
-	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::SignedOut)
-	{
-		Write-Host "No user is logged into the Lync Client.`n login before running Lync-Bot"
-	}
-	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::SigningIn)
-	{
-		Write-Host "Client is Logging in.`n Please standby."
-	}
-	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::ShuttingDown)
-	{
-		Write-Host "Lync Client is Shutting Down.`n Terminateing Bot Event Handelers"
-	}
-}
+#endregion
+
+#region Functions Required by Events 
 
 function lync-send-msg($msg)
 {
@@ -213,6 +172,42 @@ function Lync-Availability
 	
 }
 
+
+function do-Rot13
+{
+	[CmdletBinding()]
+	param (
+		[Parameter(
+				   Mandatory = $true,
+				   ValueFromPipeline = $true
+		)]
+		[String]
+		$rot13string
+	)
+	
+	[String] $string = $null;
+	$rot13string.ToCharArray() |
+	ForEach-Object {
+		Write-Verbose "$($_): $([int] $_)"
+		if ((([int] $_ -ge 97) -and ([int] $_ -le 109)) -or (([int] $_ -ge 65) -and ([int] $_ -le 77)))
+		{
+			$string += [char] ([int] $_ + 13);
+		}
+		elseif ((([int] $_ -ge 110) -and ([int] $_ -le 122)) -or (([int] $_ -ge 78) -and ([int] $_ -le 90)))
+		{
+			$string += [char] ([int] $_ - 13);
+		}
+		else
+		{
+			$string += $_
+		}
+	}
+	$string
+}
+
+#endregion
+
+#region Event actions
 # Job that is called on new message recievedvevent handeler
 $global:action = {
 	
@@ -422,7 +417,11 @@ $global:action = {
 			$hash = $hash -replace "-", ""
 			$sendMe = 1
 			$msg.Add(0, "$hash")
-			
+		}
+		"rot13"{
+			$out = do-Rot13 $attribs
+			$sendMe = 1
+			$msg.Add(0, "$out")
 		}
 		default
 		{
@@ -435,6 +434,52 @@ $global:action = {
 	{
 		# Send the message
 		lync-send-msg -msg $msg
+	}
+}
+
+#endregion
+
+#region Lync Bot Management Functions
+#Test Client State for Logon/init state
+function lync-state-change
+{
+		<#
+		.SYNOPSIS
+			lync-state-change is a PowerShell function to detect the current Lync Client state.  
+		
+		.DESCRIPTION
+   			The purpose of lync-state-change is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+	
+		.EXAMPLE
+			Lync-reload
+	#>
+	
+	
+	$Lyncstate = $Client.State
+	if ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::Uninitialized)
+	{
+		Write-Host "Lync Client not in Initialized State.`n Initializeing ..."
+		$ar = $Client.BeginInitialize()
+		$Client.EndInitialize($ar)
+		
+	}
+	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::SignedIn)
+	{
+		Write-Host "User is logged in and Powershell is ready for Bot Startup"
+		function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:"); "Lync Bot CLI [$usr] >" }
+		prompt
+	}
+	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::SignedOut)
+	{
+		Write-Host "No user is logged into the Lync Client.`n login before running Lync-Bot"
+	}
+	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::SigningIn)
+	{
+		Write-Host "Client is Logging in.`n Please standby."
+	}
+	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::ShuttingDown)
+	{
+		Write-Host "Lync Client is Shutting Down.`n Terminateing Bot Event Handelers"
 	}
 }
 
@@ -591,6 +636,9 @@ function Lync-reload
 	Import-Module 'Lync Bot'
 }
 
+#endregion
+
+#region Runtime INIT
 # Runtime INIT
 clear
 $Host.UI.RawUI.WindowTitle = "Lync Bot C&C Console"
@@ -606,6 +654,9 @@ Register-ObjectEvent -InputObject $Client `
 #init state change processing
 lync-state-change
 
+#endregion
+
+#region Export Module members
 # export module members
 Export-ModuleMember lync-State-Change
 Export-ModuleMember lync-send-msg
@@ -615,3 +666,5 @@ Export-ModuleMember Lync-Shutdown
 Export-ModuleMember Lync-Signout
 Export-ModuleMember Lync-Availability
 Export-ModuleMember Lync-reload
+Export-ModuleMember do-Rot13
+#endregion
