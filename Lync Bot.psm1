@@ -70,40 +70,40 @@ $global:Self = $client.Self
 
 #region Functions Required by Events 
 
-function lync-send-msg($msg)
+function Send-LyncMsg($msg)
 {
 	Write-Host "Bot Reply : " $msg.values
 	# Send the message
 	$null = $Modality.BeginSendMessage($msg, $null, $msg)
 }
 
-function Lync-Availability
+function Set-LyncAvailability
 {
 	
 	<#
 	.Synopsis
-   		Lync-Availability is a PowerShell function to configure a set of settings in the Microsoft Lync client via the Model API.
+   		Set-LyncAvailability is a PowerShell function to configure a set of settings in the Microsoft Lync client via the Model API.
 
 	.DESCRIPTION
-  		 The purpose of Lync-Availability is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+  		 The purpose of Set-LyncAvailability is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 
 	.EXAMPLE
-   		Lync-Availability -Availability Available
+   		Set-LyncAvailability -Availability Available
 
 	.EXAMPLE
-  	  Lync-Availability -Availability Away
+  	  Set-LyncAvailability -Availability Away
 
 	.EXAMPLE
-    	Lync-Availability -Availability "Off Work" -ActivityId off-work
+    	Set-LyncAvailability -Availability "Off Work" -ActivityId off-work
 
 	.EXAMPLE
-  	  Lync-Availability -PersonalNote test
+  	  Set-LyncAvailability -PersonalNote test
 
 	.EXAMPLE
-  	  Lync-Availability -Availability Available -PersonalNote ("Quote of the day: " + (Get-QOTD))
+  	  Set-LyncAvailability -Availability Available -PersonalNote ("Quote of the day: " + (Get-QOTD))
 
 	.EXAMPLE
-    	Lync-Availability -Location Work
+    	Set-LyncAvailability -Location Work
 
 	.FUNCTIONALITY
   		 Provides a function to configure Availability, ActivityId and PersonalNote for the Microsoft Lync client.
@@ -173,16 +173,16 @@ function Lync-Availability
 }
 
 
-function do-Rot13
+function Convert-Rot13
 {<#
 	.SYNOPSIS
 		13 Charater ASCII Shift.
 
 	.DESCRIPTION
-		do-Rot13 is a simple function that shifts text in a string value by 13 charaters.
+		Convert-Rot13 is a simple function that shifts text in a string value by 13 charaters.
 
 	.EXAMPLE
-		do-Rot13 "hello world"
+		Convert-Rot13 "hello world"
 
 	.INPUTS
 		System.String
@@ -221,20 +221,20 @@ function do-Rot13
 	$string
 }
 
-function get-hash
+function Get-Hash
 {
 	<#
 		.SYNOPSIS
 			Creates hashes of string input
 	
 		.DESCRIPTION
-			Get-hash is used to generate a hash value based upon string input. outbpt methods include MD5, SHA1, SHA256,SH 384, SHA512, RACE Integrity Primitives Evaluation Message Digest 160, and Mac Triple DES.
+			Get-Hash is used to generate a hash value based upon string input. outbpt methods include MD5, SHA1, SHA256,SH 384, SHA512, RACE Integrity Primitives Evaluation Message Digest 160, and Mac Triple DES.
 	
 		.PARAMETER algorithm  
 			The algorithm parameter is used to set the hash output type. accepted values include 'mactripledes', 'md5', 'ripemd160', 'sha1', 'sha256', 'sha384', 'sha512'.
 	
 		.EXAMPLE
-			$hash = get-hash -algorithm 'md5' -string "hello world"
+			$hash = Get-Hash -algorithm 'md5' -string "hello world"
 	
 		.INPUTS
 			System.String
@@ -393,23 +393,23 @@ $global:action = {
 		"help" {
 			$sendMe = 1
 			$msg.Add(0, 'Mr LyncBot at your service!')
-			lync-send-msg -msg $msg
+			Send-LyncMsg -msg $msg
 			sleep -Milliseconds 250
 			$msg = New-Object "System.Collections.Generic.Dictionary[Microsoft.Lync.Model.Conversation.InstantMessageContentType,String]"
 			$msg.Add(0, 'available commands:')
-			lync-send-msg -msg $msg
+			Send-LyncMsg -msg $msg
 			sleep -Milliseconds 250
 			$msg = New-Object "System.Collections.Generic.Dictionary[Microsoft.Lync.Model.Conversation.InstantMessageContentType,String]"
 			$msg.Add(0, 'hi, hey, hello')
-			lync-send-msg -msg $msg
+			Send-LyncMsg -msg $msg
 			sleep -Milliseconds 250
 			$msg = New-Object "System.Collections.Generic.Dictionary[Microsoft.Lync.Model.Conversation.InstantMessageContentType,String]"
 			$msg.Add(0, 'md5 <String>, sha1 <String>, sha256 <String>, sha384 <String>, sha512 <String>, mac3des <String>, ripemd160 <String>, rot13 <String>')
-			lync-send-msg -msg $msg
+			Send-LyncMsg -msg $msg
 			sleep -Milliseconds 250
 			$msg = New-Object "System.Collections.Generic.Dictionary[Microsoft.Lync.Model.Conversation.InstantMessageContentType,String]"
 			$msg.Add(0, 'time')
-			lync-send-msg -msg $msg
+			Send-LyncMsg -msg $msg
 			sleep -Milliseconds 250
 			$msg = New-Object "System.Collections.Generic.Dictionary[Microsoft.Lync.Model.Conversation.InstantMessageContentType,String]"
 			$msg.Add(0, '!busy, !free, !brb, !offline, !away')
@@ -422,31 +422,31 @@ $global:action = {
 		"!busy" {
 			$sendMe = 1
 			$date = [DateTime]::Now
-			Lync-Availability -Availability 'Busy' -Location 'CyberSpace' -PersonalNote "Set availability to Busy using the Lync Model API in PowerShell on $date"
+			Set-LyncAvailability -Availability 'Busy' -Location 'CyberSpace' -PersonalNote "Set availability to Busy using the Lync Model API in PowerShell on $date"
 			$msg.Add(0, 'Bot Command Accepted: setting Avaiability to Busy')
 		}
 		"!free" {
 			$sendMe = 1
 			$date = [DateTime]::Now
-			Lync-Availability -Availability 'Available'  -Location 'CyberSpace' -PersonalNote "Set availability to Available using the Lync Model API in PowerShell on $date"
+			Set-LyncAvailability -Availability 'Available'  -Location 'CyberSpace' -PersonalNote "Set availability to Available using the Lync Model API in PowerShell on $date"
 			$msg.Add(0, 'Bot Command Accepted: setting Avaiability to Available')
 		}
 		"!brb" {
 			$sendMe = 1
 			$date = [DateTime]::Now
-			Lync-Availability -Availability 'Be Right Back' -Location 'Away From Keybord' -PersonalNote "Be Right Back"
+			Set-LyncAvailability -Availability 'Be Right Back' -Location 'Away From Keybord' -PersonalNote "Be Right Back"
 			$msg.Add(0, 'Bot Command Accepted: setting Avaiability to Be Right Back')
 		}
 		"!away" {
 			$sendMe = 1
 			$date = [DateTime]::Now
-			Lync-Availability -Availability 'Away' -Location 'Away From Keybord' -PersonalNote "I'm not here at the moment."
+			Set-LyncAvailability -Availability 'Away' -Location 'Away From Keybord' -PersonalNote "I'm not here at the moment."
 			$msg.Add(0, 'Bot Command Accepted: setting Avaiability to away')
 		}
 		"!offline" {
 			$sendMe = 1
 			$date = [DateTime]::Now
-			Lync-Availability -Availability 'Appear Offline' 
+			Set-LyncAvailability -Availability 'Appear Offline' 
 			$msg.Add(0, 'Bot Command Accepted: setting Avaiability to Offline')
 		}
 		"dcpromo"{
@@ -466,42 +466,42 @@ $global:action = {
 			$msg.Add(0, 'What ?')
 		}
 		"md5"{
-			$hash = get-hash -algorithm 'md5' -string $attribs
+			$hash = Get-Hash -algorithm 'md5' -string $attribs
 			$sendMe = 1
 			$msg.Add(0, "$hash")
 		}
 		"sha1"{
-			$hash = get-hash -algorithm 'sha1' -string $attribs
+			$hash = Get-Hash -algorithm 'sha1' -string $attribs
 			$sendMe = 1
 			$msg.Add(0, "$hash")
 		}
 		"sha256"{
-			$hash = get-hash -algorithm 'sha256' -string $attribs
+			$hash = Get-Hash -algorithm 'sha256' -string $attribs
 			$sendMe = 1
 			$msg.Add(0, "$hash")
 		}
 		"sha384"{
-			$hash = get-hash -algorithm 'sha384' -string $attribs
+			$hash = Get-Hash -algorithm 'sha384' -string $attribs
 			$sendMe = 1
 			$msg.Add(0, "$hash")
 		}
 		"sha512"{
-			$hash = get-hash -algorithm 'sha512' -string $attribs
+			$hash = Get-Hash -algorithm 'sha512' -string $attribs
 			$sendMe = 1
 			$msg.Add(0, "$hash")
 		}
 		"mac3des"{
-			$hash = get-hash -algorithm 'mactripledes' -string $attribs
+			$hash = Get-Hash -algorithm 'mactripledes' -string $attribs
 			$sendMe = 1
 			$msg.Add(0, "$hash")
 		}
 		"ripemd160"{
-			$hash = get-hash -algorithm 'ripemd160' -string $attribs
+			$hash = Get-Hash -algorithm 'ripemd160' -string $attribs
 			$sendMe = 1
 			$msg.Add(0, "$hash")
 		}
 		"rot13"{
-			$out = do-Rot13 $attribs
+			$out = Convert-Rot13 $attribs
 			$sendMe = 1
 			$msg.Add(0, "$out")
 		}
@@ -515,7 +515,7 @@ $global:action = {
 	if ($sendMe -eq 1)
 	{
 		# Send the message
-		lync-send-msg -msg $msg
+		Send-LyncMsg -msg $msg
 	}
 }
 
@@ -523,17 +523,17 @@ $global:action = {
 
 #region Lync Bot Management Functions
 #Test Client State for Logon/init state
-function lync-state-change
+function Register-LyncStateChange
 {
 		<#
 		.SYNOPSIS
-			lync-state-change is a PowerShell function to detect the current Lync Client state.  
+			Register-LyncStateChange is a PowerShell function to detect the current Lync Client state.  
 		
 		.DESCRIPTION
-   			The purpose of lync-state-change is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+   			The purpose of Register-LyncStateChange is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 	
 		.EXAMPLE
-			Lync-reload
+			Restart-LyncBot
 	#>
 	
 	
@@ -548,12 +548,12 @@ function lync-state-change
 	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::SignedIn)
 	{
 		Write-Host "User is logged in and Powershell is ready for Bot Startup"
-		function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:"); "Lync Bot CLI [$usr] >" }
+		function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:"); "Lync Bot CLI [$usr] [Bot:OFF] >" }
 		prompt
 	}
 	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::SignedOut)
 	{
-		Write-Host "No user is logged into the Lync Client.`n login before running Lync-Bot"
+		Write-Host "No user is logged into the Lync Client.`n login before running Start-LyncBot"
 	}
 	elseif ($Lyncstate -eq [Microsoft.Lync.Model.ClientState]::SigningIn)
 	{
@@ -565,88 +565,88 @@ function lync-state-change
 	}
 }
 
-function Lync-NoBot
+function Stop-LyncBot
 {
 	<#
 		.SYNOPSIS
-			Lync-NoBot is a PowerShell function to turn off the Lync Autoresponce bot 
+			Stop-LyncBot is a PowerShell function to turn off the Lync Autoresponce bot 
 
 		.DESCRIPTION
-   			The purpose of Lync-NoBot is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+   			The purpose of Stop-LyncBot is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 	
 		.EXAMPLE
-			Lync-NoBot
+			Stop-LyncBot
 	#>
 	
 	# Clear all Bot subscribed events
 	Get-EventSubscriber | Unregister-Event
-	function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:");"Lync Bot CLI [$usr] >" }
+	function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:"); "Lync Bot CLI [$usr] [Bot:OFF] >" }
 }
 
-function Lync-Signin ([System.String]$UserURI)
+function Request-LyncSignin ([System.String]$UserURI)
 {
 		<#
 		.SYNOPSIS
-			Lync-Signin is a PowerShell function to turn off the Lync Autoresponce bot and sign out of the Lync client 
+			Request-LyncSignin is a PowerShell function to turn off the Lync Autoresponce bot and sign out of the Lync client 
 
 		.DESCRIPTION
-   			The purpose of Lync-Signin is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+   			The purpose of Request-LyncSignin is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 	
 		.EXAMPLE
-			Lync-Signin -UserURI User@demo.com
+			Request-LyncSignin -UserURI User@demo.com
 	#>
 	$credential = Get-Credential -message "Lync Credentials requires `nSpecify Username as Domain\user"
 	Write-Host "Signing in Please stand by"
 	$ar = $Client.BeginSignIn($UserURI, $credential.UserName, $credential.Password, $communicatorClientCallback, $state)
 	while ($ar.IsCompleted -eq $false) { }
 	$Client.EndSignIn($ar)
-	Write-Host "Signed in. `nRun Lync-bot to start the bot."
-	function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:"); "Lync Bot CLI [$usr] >" }
+	Write-Host "Signed in. `nRun Start-LyncBot to start the bot."
+	function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:"); "Lync Bot CLI [$usr] [Bot:OFF] >" }
 }
 
-function Lync-Signout
+function Request-LyncSignout
 {
 		<#
 		.SYNOPSIS
-			Lync-Signout is a PowerShell function to turn off the Lync Autoresponce bot and sign out of the Lync client 
+			Request-LyncSignout is a PowerShell function to turn off the Lync Autoresponce bot and sign out of the Lync client 
 
 		.DESCRIPTION
-   			The purpose of Lync-Signout is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+   			The purpose of Request-LyncSignout is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 	
 		.EXAMPLE
-			Lync-Signout
+			Request-LyncSignout
 	#>
 	
 	Write-Host "Unsubscribeing All Lync Events this session"
-	Lync-NoBot
+	Stop-LyncBot
 	Write-Host "initializeing signout process"
 	$ar = $Client.BeginSignOut($communicatorClientCallback, $null)
 	while ($ar.IsCompleted -eq $false) { }
 	$Client.EndSignOut($ar)
 	Write-Host "Signed out of Lync Client"
-	function Global:prompt { "Lync Bot CLI >" }
+	function Global:prompt { "Lync Bot CLI [Signed Out] [Bot:OFF] >" }
 prompt	
 }
 
-function Lync-Shutdown ([system.Boolean]$Confirm)
+function Exit-LyncBot ([system.Boolean]$Confirm)
 {
 		<#
 		.SYNOPSIS
-			Lync-Shutdown is a PowerShell function to Shutdown the Lync Client 
+			Exit-LyncBot is a PowerShell function to Shutdown the Lync Client 
 		
 		.DESCRIPTION
-   			The purpose of Lync-Shutdown is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+   			The purpose of Exit-LyncBot is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 	
 		.PARAMETER Confirm
 				Used to Confirm the Lync Client Shutdown Process
 
 		.EXAMPLE
-			Lync-Shutdown -Confirm
+			Exit-LyncBot -Confirm
 	#>
 	
 	if ($Confirm -eq $true)
 	{
-		Lync-Signout
+		Request-LyncSignout
 		Write-Host "Starting Client Shutdown"
 		$ar = $Client.BeginShutdown($communicatorClientCallback, $null)
 		while ($ar.IsCompleted -eq $false) { }
@@ -658,17 +658,17 @@ function Lync-Shutdown ([system.Boolean]$Confirm)
 	
 }
 
-function Lync-Bot
+function Start-LyncBot
 {
 		<#
 		.SYNOPSIS
-			Lync-Bot is a PowerShell function to Start the Lync Auto responder bot 
+			Start-LyncBot is a PowerShell function to Start the Lync Auto responder bot 
 		
 		.DESCRIPTION
-   			The purpose of Lync-Bot is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+   			The purpose of Start-LyncBot is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 	
 		.EXAMPLE
-			Lync-Bot
+			Start-LyncBot
 	#>
 	$ErrorActionPreference = [System.Management.Automation.ActionPreference]::SilentlyContinue
 		# Register events for current open conversation participants
@@ -721,20 +721,20 @@ function Lync-Bot
 	function Global:prompt { [System.String]$Global:usr = $Client.Uri.TrimStart("sip:");"Lync Bot CLI [$usr] [Bot:ON] >" }
 }
 
-function Lync-reload
+function Restart-LyncBot
 {
 	<#
 		.SYNOPSIS
-			Lync-reload is a PowerShell function to Kill the autoresponce bot and reload the Lync bot module.  
+			Restart-LyncBot is a PowerShell function to Kill the autoresponce bot and reload the Lync bot module.  
 		
 		.DESCRIPTION
-   			The purpose of Lync-reload is to demonstrate how PowerShell can be used to interact with the Lync SDK.
+   			The purpose of Restart-LyncBot is to demonstrate how PowerShell can be used to interact with the Lync SDK.
 	
 		.EXAMPLE
-			Lync-reload 
+			Restart-LyncBot 
 	#>
 	
-	Lync-NoBot
+	Stop-LyncBot
 	Remove-Module 'Lync Bot'
 	Import-Module '.\Lync Bot.psd1'
 }
@@ -745,31 +745,31 @@ function Lync-reload
 # Runtime INIT
 clear
 $Host.UI.RawUI.WindowTitle = "Lync Bot C&C Console"
-function Global:prompt { "Lync Bot CLI >" }
+function Global:prompt { "Lync Bot CLI [Signed Out] [Bot:OFF] >" }
 prompt
 
 #State change notification event registration
 Register-ObjectEvent -InputObject $Client `
 					 -EventName "StateChanged" `
 					 -SourceIdentifier "LyncClientStateChanged" `
-					 -action { lync-state-change }
+					 -action { Register-LyncStateChange }
 
 #init state change processing
-lync-state-change
+Register-LyncStateChange
 
 #endregion
 
-#region Export Module members
+#region Export Module members	
 # export module members
-Export-ModuleMember lync-State-Change
-Export-ModuleMember lync-send-msg
-Export-ModuleMember Lync-Bot
-Export-ModuleMember Lync-NoBot
-Export-ModuleMember Lync-Shutdown
-Export-ModuleMember Lync-Signout
-Export-ModuleMember Lync-Signin
-Export-ModuleMember Lync-Availability
-Export-ModuleMember Lync-reload
-Export-ModuleMember do-Rot13
-Export-ModuleMember get-hash
+Export-ModuleMember Register-LyncStateChange
+Export-ModuleMember Send-LyncMsg
+Export-ModuleMember Start-LyncBot
+Export-ModuleMember Stop-LyncBot
+Export-ModuleMember Exit-LyncBot
+Export-ModuleMember Request-LyncSignout
+Export-ModuleMember Request-LyncSignin
+Export-ModuleMember Set-LyncAvailability
+Export-ModuleMember Restart-LyncBot
+Export-ModuleMember Convert-Rot13
+Export-ModuleMember Get-Hash
 #endregion
