@@ -174,7 +174,23 @@ function Lync-Availability
 
 
 function do-Rot13
-{
+{<#
+	.SYNOPSIS
+		13 Charater ASCII Shift.
+
+	.DESCRIPTION
+		do-Rot13 is a simple function that shifts text in a string value by 13 charaters.
+
+	.EXAMPLE
+		do-Rot13 "hello world"
+
+	.INPUTS
+		System.String
+
+	.OUTPUTS
+		System.String
+#>
+
 	[CmdletBinding()]
 	param (
 		[Parameter(
@@ -205,6 +221,14 @@ function do-Rot13
 	$string
 }
 
+function do-md5 ([system.String]$string)
+{
+	$md5 = new-object -TypeName System.Security.Cryptography.MD5CryptoServiceProvider
+	$utf8 = new-object -TypeName System.Text.UTF8Encoding
+	$hash = [System.BitConverter]::ToString($md5.ComputeHash($utf8.GetBytes($string)))
+	$hash = $hash -replace "-", ""
+	return $hash
+}
 #endregion
 
 #region Event actions
@@ -411,10 +435,7 @@ $global:action = {
 			$msg.Add(0, 'What ?')
 		}
 		"md5"{
-			$md5 = new-object -TypeName System.Security.Cryptography.MD5CryptoServiceProvider
-			$utf8 = new-object -TypeName System.Text.UTF8Encoding
-			$hash = [System.BitConverter]::ToString($md5.ComputeHash($utf8.GetBytes($attribs)))
-			$hash = $hash -replace "-", ""
+			$hash = do-md5 -string $attribs
 			$sendMe = 1
 			$msg.Add(0, "$hash")
 		}
@@ -689,4 +710,5 @@ Export-ModuleMember Lync-Signin
 Export-ModuleMember Lync-Availability
 Export-ModuleMember Lync-reload
 Export-ModuleMember do-Rot13
+Export-ModuleMember do-md5
 #endregion
