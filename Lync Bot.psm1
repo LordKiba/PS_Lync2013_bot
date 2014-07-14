@@ -221,11 +221,42 @@ function do-Rot13
 	$string
 }
 
-function do-md5 ([system.String]$string)
+function get-hash
 {
-	$md5 = new-object -TypeName System.Security.Cryptography.MD5CryptoServiceProvider
+	<#
+		.SYNOPSIS
+			Creates hashes of string input
+	
+		.DESCRIPTION
+			Get-hash is used to generate a hash value based upon string input. outbpt methods include MD5, SHA1, SHA256,SH 384, SHA512, RACE Integrity Primitives Evaluation Message Digest 160, and Mac Triple DES.
+	
+		.PARAMETER algorithm  
+			The algorithm parameter is used to set the hash output type. accepted values include 'mactripledes', 'md5', 'ripemd160', 'sha1', 'sha256', 'sha384', 'sha512'.
+	
+		.EXAMPLE
+			$hash = get-hash -algorithm 'md5' -string "hello world"
+	
+		.INPUTS
+			System.String
+	
+		.OUTPUTS
+			System.String
+
+	#>
+	
+	
+	Param (
+		[ValidateSet('mactripledes', 'md5', 'ripemd160', 'sha1', 'sha256', 'sha384', 'sha512')]
+		[string]
+		$algorithm,
+		# ActivityId as string
+		[string]
+		$string
+	)
+	
+	$crypto = [System.Security.Cryptography.HashAlgorithm]::create($algorithm)
 	$utf8 = new-object -TypeName System.Text.UTF8Encoding
-	$hash = [System.BitConverter]::ToString($md5.ComputeHash($utf8.GetBytes($string)))
+	$hash = [System.BitConverter]::ToString($crypto.ComputeHash($utf8.GetBytes($string)))
 	$hash = $hash -replace "-", ""
 	return $hash
 }
@@ -373,7 +404,7 @@ $global:action = {
 			lync-send-msg -msg $msg
 			sleep -Milliseconds 250
 			$msg = New-Object "System.Collections.Generic.Dictionary[Microsoft.Lync.Model.Conversation.InstantMessageContentType,String]"
-			$msg.Add(0, 'md5 <String>, rot13 <String>')
+			$msg.Add(0, 'md5 <String>, sha1 <String>, sha256 <String>, sha384 <String>, sha512 <String>, mac3des <String>, ripemd160 <String>, rot13 <String>')
 			lync-send-msg -msg $msg
 			sleep -Milliseconds 250
 			$msg = New-Object "System.Collections.Generic.Dictionary[Microsoft.Lync.Model.Conversation.InstantMessageContentType,String]"
@@ -435,7 +466,37 @@ $global:action = {
 			$msg.Add(0, 'What ?')
 		}
 		"md5"{
-			$hash = do-md5 -string $attribs
+			$hash = get-hash -algorithm 'md5' -string $attribs
+			$sendMe = 1
+			$msg.Add(0, "$hash")
+		}
+		"sha1"{
+			$hash = get-hash -algorithm 'sha1' -string $attribs
+			$sendMe = 1
+			$msg.Add(0, "$hash")
+		}
+		"sha256"{
+			$hash = get-hash -algorithm 'sha256' -string $attribs
+			$sendMe = 1
+			$msg.Add(0, "$hash")
+		}
+		"sha384"{
+			$hash = get-hash -algorithm 'sha384' -string $attribs
+			$sendMe = 1
+			$msg.Add(0, "$hash")
+		}
+		"sha512"{
+			$hash = get-hash -algorithm 'sha512' -string $attribs
+			$sendMe = 1
+			$msg.Add(0, "$hash")
+		}
+		"mac3des"{
+			$hash = get-hash -algorithm 'mactripledes' -string $attribs
+			$sendMe = 1
+			$msg.Add(0, "$hash")
+		}
+		"ripemd160"{
+			$hash = get-hash -algorithm 'ripemd160' -string $attribs
 			$sendMe = 1
 			$msg.Add(0, "$hash")
 		}
@@ -710,5 +771,5 @@ Export-ModuleMember Lync-Signin
 Export-ModuleMember Lync-Availability
 Export-ModuleMember Lync-reload
 Export-ModuleMember do-Rot13
-Export-ModuleMember do-md5
+Export-ModuleMember get-hash
 #endregion
