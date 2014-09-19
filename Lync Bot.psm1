@@ -2,8 +2,8 @@
 	===========================================================================
 	 Created with: 	SAPIEN Technologies, Inc., PowerShell Studio 2014 v4.1.54
 	 Created on:   	6/25/2014 7:20 PM
-	 Created by:   	James A Kulikowski
-	 Organization: 	GFG
+	 Created by:   	KSI SYN
+	 Organization: 	SCN
 	 Filename:     	Lync Bot.psm1
 	-------------------------------------------------------------------------
 	 Module Name: Lync Bot
@@ -49,23 +49,30 @@ catch [Microsoft.Lync.Model.ClientNotFoundException]
 $Client.add_StateChanged
 
 # test loading of Client Automation API's 
-try
+If ($Client.InSuppressedMode -eq $false)
 {
-	$global:Auto = [Microsoft.Lync.Model.LyncClient]::GetAutomation()
-	
-	if ($Auto -eq $null)
+	try
 	{
-		throw "Unable to obtain Lync Automation interface"
+		$global:Auto = [Microsoft.Lync.Model.LyncClient]::GetAutomation()
+		
+		if ($Auto -eq $null)
+		{
+			throw "Unable to obtain Lync Automation interface"
+		}
+		
+	}
+	catch
+	{
+		throw "Automation Session is unavaiable"
 	}
 	
+	$global:Self = $client.Self
 }
-catch
+Else
 {
-	throw "Automation Session is unavaiable" 
+	"UI Supression Mode is Active Suppressing UI Client Automation API's"
+	'`n Sign in will need to be done via Command line'
 }
-
-$global:Self = $client.Self
-
 #endregion
 
 #region Functions Required by Events 
@@ -565,6 +572,11 @@ function Register-LyncStateChange
 	}
 }
 
+function get-lynccommand
+{
+Get-Command -Module 'lync bot'	
+}
+
 function Stop-LyncBot
 {
 	<#
@@ -772,4 +784,5 @@ Export-ModuleMember Set-LyncAvailability
 Export-ModuleMember Restart-LyncBot
 Export-ModuleMember Convert-Rot13
 Export-ModuleMember Get-Hash
+Export-ModuleMember get-lynccommand
 #endregion

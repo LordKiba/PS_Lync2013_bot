@@ -2,8 +2,8 @@
 	===========================================================================
 	 Created with: 	SAPIEN Technologies, Inc., PowerShell Studio 2014 v4.1.54
 	 Created on:   	6/25/2014 7:20 PM
-	 Created by:   	James A Kulikowski
-	 Organization: 	GFG
+	 Created by:   	KSI SYN
+	 Organization: 	SCN
 	 Filename:     	Lync Bot.psd1
 	 -------------------------------------------------------------------------
 	 Module Manifest
@@ -24,10 +24,10 @@ ModuleVersion = '1.5.0.8'
 GUID = 'a70892e8-53a3-4311-a2f4-e137bc36cfbd'
 
 # Author of this module
-Author = 'James A Kulikowski'
+Author = 'KSI SYN'
 
 # Company or vendor of this module
-CompanyName = 'GFG'
+CompanyName = 'Syn City Networks'
 
 # Copyright statement for this module
 Copyright = '(c) 2014. All rights reserved.'
